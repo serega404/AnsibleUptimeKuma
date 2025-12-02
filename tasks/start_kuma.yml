@@ -1,0 +1,6 @@
+---
+- name: Start Uptime Kuma using Docker Compose
+  shell: |
+    docker compose -f /srv/uptimekuma/compose.yml up -d
+  args:
+    chdir: /srv/uptimekuma

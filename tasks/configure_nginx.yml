@@ -1,0 +1,42 @@
+---
+- name: Remove default Nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Create Nginx configuration for Uptime Kuma
+  copy:
+    dest: /etc/nginx/sites-available/uptime-kuma
+    content: |
+      server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        http2 on;
+        server_name {{ domain }};
+        ssl_certificate     /root/.acme.sh/{{ domain }}_ecc/fullchain.cer;
+        ssl_certificate_key /root/.acme.sh/{{ domain }}_ecc/{{ domain }}.key;
+
+        location / {
+          proxy_set_header   X-Real-IP $remote_addr;
+          proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header   Host $host;
+          proxy_pass         http://localhost:3001/;
+          proxy_http_version 1.1;
+          proxy_set_header   Upgrade $http_upgrade;
+          proxy_set_header   Connection "upgrade";
+        }
+      }
+
+- name: Enable Nginx configuration
+  file:
+    src: /etc/nginx/sites-available/uptime-kuma
+    dest: /etc/nginx/sites-enabled/uptime-kuma
+    state: link
+
+- name: Test Nginx configuration
+  command: nginx -t
+
+- name: Reload Nginx
+  service:
+    name: nginx
+    state: reloaded

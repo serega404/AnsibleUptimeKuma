@@ -1,0 +1,22 @@
+---
+- name: Install required packages
+  apt:
+    name:
+      - curl
+      - cron
+      - nginx
+      - ufw
+    state: present
+
+- name: Check if Docker repository exists
+  shell: |
+    apt-cache policy docker-ce | grep -q 'https://download.docker.com'
+  register: docker_repo_check
+  ignore_errors: true
+
+- name: Install Docker using official script
+  shell: |
+    curl -sSL https://get.docker.com | sh
+  register: docker_install_result
+  failed_when: docker_install_result.rc != 0
+  when: docker_repo_check.rc != 0

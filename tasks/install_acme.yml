@@ -1,0 +1,34 @@
+---
+- name: Install acme.sh
+  shell: |
+    curl https://get.acme.sh | sh
+  args:
+    creates: /root/.acme.sh/acme.sh
+
+- name: Set Let's Encrypt as default CA in acme.sh
+  shell: |
+    ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+
+- name: Stop Nginx if running
+  service:
+    name: nginx
+    state: stopped
+  when: ansible_service_mgr == 'systemd'
+
+- name: Check if SSL certificate exists
+  stat:
+    path: /root/.acme.sh/{{ domain }}_ecc/fullchain.cer
+  register: cert_status
+
+- name: Issue SSL certificate using acme.sh
+  shell: |
+    ~/.acme.sh/acme.sh --issue --standalone -d {{ domain }}
+  args:
+    creates: /root/.acme.sh/{{ domain }}_ecc/fullchain.cer
+  when: not cert_status.stat.exists
+
+- name: Start Nginx after certificate issuance
+  service:
+    name: nginx
+    state: started
+  when: ansible_service_mgr == 'systemd'

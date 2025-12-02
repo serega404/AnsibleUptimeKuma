@@ -1,0 +1,17 @@
+---
+- name: Install Uptime Kuma
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Fail if domain is not defined
+      fail:
+        msg: "The variable 'domain' must be defined in group_vars/all.yml."
+      when: domain is not defined
+    - include_tasks: tasks/update_system.yml
+    - include_tasks: tasks/install_packages.yml
+    - include_tasks: tasks/install_acme.yml
+    - include_tasks: tasks/setup_compose.yml
+    - include_tasks: tasks/start_kuma.yml
+    - include_tasks: tasks/configure_nginx.yml
+    - include_tasks: tasks/configure_firewall.yml
