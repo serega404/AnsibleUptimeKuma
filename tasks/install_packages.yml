@@ -6,6 +6,7 @@
       - cron
       - nginx
       - ufw
+      - fail2ban
     state: present
 
 - name: Check if Docker repository exists

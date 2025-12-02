@@ -14,4 +14,5 @@
     - include_tasks: tasks/setup_compose.yml
     - include_tasks: tasks/start_kuma.yml
     - include_tasks: tasks/configure_nginx.yml
+    - include_tasks: tasks/configure_fail2ban.yml
     - include_tasks: tasks/configure_firewall.yml

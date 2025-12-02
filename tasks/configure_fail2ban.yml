@@ -1,0 +1,24 @@
+---
+- name: Ensure Fail2Ban is enabled and running
+  service:
+    name: fail2ban
+    state: started
+    enabled: true
+
+- name: Configure Fail2Ban for SSH
+  copy:
+    dest: /etc/fail2ban/jail.local
+    content: |
+      [sshd]
+      enabled  = true
+      port     = ssh
+      bantime = 10m
+      findtime = 2m
+      maxretry = 5
+  
+- name: Restart Fail2Ban to apply changes
+  service:
+    name: fail2ban
+    state: restarted
+
+

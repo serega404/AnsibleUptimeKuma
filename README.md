@@ -17,11 +17,12 @@ Playbook предназначен для автоматической устан
   - `start_kuma.yml` — запуск Uptime Kuma.
   - `configure_nginx.yml` — настройка Nginx.
   - `configure_firewall.yml` — настройка брандмауэра.
+  - `configure_fail2ban.yml` — настройка Fail2Ban.
 
 ## Предварительные требования
 
 1. **Ansible**: Убедитесь, что Ansible установлен на вашей локальной машине.
-2. **Целевые хосты**: Укажите серверы с ОС на базе Debian/Ubuntu в файле [`inventory.yml`](inventory.yml).
+2. **Целевые хосты**: Укажите серверы с ОС на базе Debian/Ubuntu и с root доступом в файле [`inventory.yml`](inventory.yml).
 3. **Домен**: Направьте домен на ваш сервер и укажите его в файле [`group_vars/all.yml`](group_vars/all.yml):
 
 ```yaml
@@ -38,7 +39,6 @@ cd AnsibleUptimeKuma
 ```
 
 2. Укажите целевые хосты в `inventory.yml`.
-
 3. Запустите playbook:
 
 ```bash
@@ -57,12 +57,13 @@ ansible-playbook -i inventory.yml install_kuma.yml
 
 Файл: `tasks/install_packages.yml`
 
-Устанавливает необходимые пакеты: `curl`, `cron`, `nginx`, `ufw` и Docker.
+Устанавливает необходимые пакеты: `curl`, `cron`, `nginx`, `ufw`, `fail2ban` и Docker.
 
 - curl - для загрузки скриптов.
 - cron - для периодического обновления SSL-сертификатов (зависимость от acme.sh).
 - nginx - для обратного проксирования.
 - ufw - для настройки брандмауэра.
+- fail2ban - для защиты от брутфорс-атак.
 
 ### 3. Настройка SSL
 
@@ -98,6 +99,13 @@ ansible-playbook -i inventory.yml install_kuma.yml
 
 - Разрешает порты 22 (SSH), 80 (HTTP) и 443 (HTTPS).
 - Включает UFW.
+
+### 8. Настройка Fail2Ban
+
+Файл: `tasks/configure_fail2ban.yml`
+
+- Устанавливает и настраивает Fail2Ban.
+- Защищает ssh от брутфорс-атак. (всё же рекомендуется отключить вход по паролю)
 
 ## Примечания
 
