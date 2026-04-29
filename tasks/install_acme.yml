@@ -13,7 +13,7 @@
   service:
     name: nginx
     state: stopped
-  when: ansible_service_mgr == 'systemd'
+  when: ansible_facts['service_mgr'] == 'systemd'
 
 - name: Check if SSL certificate exists
   stat:
@@ -31,4 +31,4 @@
   service:
     name: nginx
     state: started
-  when: ansible_service_mgr == 'systemd'
+  when: ansible_facts['service_mgr'] == 'systemd'
